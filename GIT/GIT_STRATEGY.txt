@@ -1,0 +1,127 @@
+Files in local to be uploaded to feature branch
+-----------------------------------------------
+-----------------------------------------------
+
+
+Aim :In the local , make the FB sync in the local along with the changes made locally.
+
+From the work space 
+ * git status 
+
+//this command will tell the status of files.
+
+git stash
+
+//put changes in the temp folder in the local
+
+
+git pull --rebase origin <FB>
+
+//brings the FEATURE BRANCH into local
+
+
+
+git stash pop 
+
+// the changes in the temp folder is merged into the LOCL FB 
+
+
+git status
+// no changes should show
+
+
+
+--------------------------------- THE LOCAL FB HAS GOT FB+CHANGES
+
+
+
+
+
+
+
+
+
+
+
+
+AIM: LOCAL GET DM AND PUSH THE CHANGES INTO IT IN LOCAL SO THAT THE LOCAL HAS DM+LOCAL CHANGES.
+
+
+git stash
+
+//move changes to temp folder
+
+
+git pull --rebase origin <DM>
+
+//GET THE DM branch in the local
+
+
+git stash pop 
+
+// adds the changes from the temp folder into the pulled DM codebase in the local.
+
+
+DM = LOCAL 
+
+git status
+
+(ADDLN FILES V/S DM CODE)
+
+----------------------------------
+
+
+
+
+aim: to move the changes into fb....which is in the local
+
+
+git status
+//shows the changes made in the dev_master
+
+git add .
+//add the changes in to the DM
+
+git commit -m "comment"
+
+//commits the code with the tagged comment
+
+
+
+git push origin <DM>
+
+//now dm in github updated..
+
+git status 
+
+//should show no change 
+
+----------------------------------
+
+aim: to move the changes into dev master....which is in the local
+
+git checkout DEV_MASTER
+
+SWITCH TO MASTER ....
+
+
+git status
+//shows the changes made in the dev_master
+
+git add .
+//add the changes in to the DM
+
+git commit -m "comment"
+
+//commits the code with the tagged comment
+
+
+
+git push origin <DM>
+
+//now dm in github updated..
+
+git status 
+
+//should show no change 
+

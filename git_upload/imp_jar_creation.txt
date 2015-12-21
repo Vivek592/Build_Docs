@@ -1,0 +1,144 @@
+##=======================================================
+##
+##	buildfile.rb - details
+##
+##=======================================================
+
+
+The buildfile will generate you a jarfile which contains all of the services (currently defined in the buildfile) into a single jarfile.
+
+The process:
+
+
+============================================================================================================
+
+Step 1.  As per the old process: You will need to create a zipfile of the canonical
+
+
+git pull from https://github.com/KITSGitHubAdmin/KITS-SOA_ServiceDefinitions
+
+(on the VM (Ubuntu) - this should be checked out already - /home/atg/Git/KITS-SOA_ServiceDefinitions)
+
+
+
+Make sure you are on the right branch for your project, 
+
+e.g. git branch (master)  
+git checkout -b CR3
+
+
+
+Using a browser check the latest version of the canonical in the Nexus repo:
+
+
+http://lnxs0031.uk.b-and-q.com:8088/nexus/content/repositories/releases/kf/ws/canonical
+(You can also check the buildfile.rb file - to see what the last version is: - 
+
+
+zip up the folders in the SOA Repository you just checked out. Call the zip file the next version of the e.g. canonical-0.0.X.zip  or canonical-0.0.X.F3.zip
+
+
+============================================================================================================
+
+
+Step 2.   UPLOADING TO NEXUS
+
+
+Manually upload the canonical zip you just created into the nexus repository. Login to lnxs0031.uk.b-and-q.com and perform an artifact upload.
+
+select from GAV parameters:
+
+groupId: kf.ws
+version: 0.0.X
+artifcact: canonical
+packaging zip
+
+upload the zip in the upload files and save.
+
+
+
+
+
+============================================================================================================
+
+
+Step 3.   CREATING THE JAR FILE  (Adding a new service? Please do Step 5. First)
+
+
+
+-- Now you can change your buildfile.rb file to reference the new canonical zip.
+
+e.g.  KF/env-install/ws/buildfile.rb) - axis_wsdl2java.canonical_version('kf.ws:canonical:zip:0.0.X.FX')
+
+		Git/KITS_App_ATG-Dev/kf/env-install/ws => axis_wsdl2java.canonical_version('kf.ws:canonical:zip:0.0.3.F4') =>> change 2 to 3
+
+-- Change/Increment the version in the buildfile of the jar you are going to create:
+
+ project.version = '0.0.2'  (incrementing here in this case) ->    project.version = '0.0.3'
+
+
+From the env-install/ws directory run: 
+
+buildr axis2_wsdl2java install
+
+
+This will produce the jar file and install it in your local maven repository so you can test locally with it
+
+
+atg@atg-VirtualBox:~/Git/KITS-App_ATG-Dev$ cd KF
+atg@atg-VirtualBox:~/Git/KITS-App_ATG-Dev/KF$ cd env-install/
+atg@atg-VirtualBox:~/Git/KITS-App_ATG-Dev/KF/env-install$ cd ws
+atg@atg-VirtualBox:~/Git/KITS-App_ATG-Dev/KF/env-install/ws$ pwd
+/home/atg/Git/KITS-App_ATG-Dev/KF/env-install/ws
+atg@atg-VirtualBox:~/Git/KITS-App_ATG-Dev/KF/env-install/ws$ buildr axis2_wsdl2java install
+
+
+============================================================================================================
+
+
+Step 4.   TELL THE APPLICATION TO USE THE LATEST
+
+home/atg/Git/KITS-App_ATG-Dev/KF/env-install/deps
+Update the kf_deps.rb file located under KF/env-install/deps/kf_deps.rb
+
+
+KF_SERVICES_ALL = "kf.ws:kf-services:jar:0.0.2"   -> (becomes)		KF_SERVICES_ALL = "kf.ws:kf-services:jar:0.0.3"
+
+
+Now run a buildr clean_build_and_assemble eclipse_clean eclipse_extra
+
+cbh >> buildr clean build link assemble eclipse_clean eclipse_extra
+
+if all has worked well, your eclipse projects should be referencing your new jarfile and the application should be assembled against the latest version
+
+
+
+
+============================================================================================================
+
+
+Step 5.   ADDING A NEW SERVICE?
+
+
+Simply update the buildfile to include the new service definition:
+
+-- Add a new line and define the service (example)
+
+  services.push( {:servicename => "MoneyBackService", :package => "money.back", :binding => true, :binding_name => "SynchroniseMoneyBackJMSBinding"} )
+
+
+
+
+MY NOTES
+========
+
+1. change the version name seeing nexus buildfile.rb (/Git/Kits-App-Atg_Dev/env-install/ws ) gedit->open buildfile.rb
+    <<project.canonical_version = 'kf.ws:canonical:zip:0.0.3.F4'>>
+2. change core.rb <<resolve_artifact 'kf.ws:canonical:zip:0.0.3.F4'>> </Git/KfUtil_Build-Dev/lib/kfutil/env-install)
+3. run the command buildr -f buildfile_old.rb ws:invoice:install 
+my case : /Git/KITS-App_ATG-Dev/KF/env-install/ws$ buildr  ws:invoice:install
+
+http://28.24.10.62:8088/nexus/content/groups/public/kf/ws/canonical/
+
+target -> clear the target folder
+/home/atg/Git/KITS-App_ATG-Dev/KF/env-install/ws/invoice/target/ws-invoice-0.0.3.F4.pom to /home/atg/.m2/repository/kf/ws/ws-invoice/0.0.11.F3/ws-invoice-0.0.3.F4.pom

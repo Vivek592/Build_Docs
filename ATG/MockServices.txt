@@ -1,0 +1,39 @@
+Steps to start the mock Services
+=================================
+
+1.Log into lnxs0086
+
+2.Navigate into /app/jboss/apache-tomcat-6.0.35/bin
+
+3.bash shutdown.sh
+This will stop the instance for mock
+
+4.bash startup.sh
+This will start the instance for mock
+
+5.Verification
+
+Try with this URL : http://lnxs0086:8000/mockws.war/commidea/mockCommideaGatewaySoap?WSDL
+
+If this page loads , then the instance for the mock is up and running .
+
+If this page fails to loads : 
+
+Click the url " http://lnxs0086:8000 "
+
+This must show you the tomcat home page :
+
+Username : tomcat
+Password : terc3s (****Change Accordingly)
+
+
+
+Here , search for /mockws.war in the applications . Just Reload the same .
+
+This should load the mock services .
+
+
+Regards ,
+
+Build Team
+Offshore KOLKATA

@@ -1,0 +1,9 @@
+git config --global user.name name
+git config --global user.email email
+git config --global http.proxy http://empid:indiadomainpwd@172.18.18.13:8080
+
+ssh-keygen -t rsa -C "emailid"
+
+cat /root/.ssh/id_rsa.pub
+
+copy the content & paste in your git ssh key 

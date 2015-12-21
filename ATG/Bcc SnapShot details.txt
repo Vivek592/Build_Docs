@@ -1,0 +1,24 @@
+
+
+The following are the steps to be followed after , the CI has completed successfully .
+
+OPen the BCC & check the health status of the server by clicking the Admin Console in Content Administration & also the snapshots for the production & staging i.e THEY SHOULD BE SAME.
+
+In case , if the snapshots are mismatching , then open the dyn/admin to forcefully set the snapshot id .
+To do so , follow the mentioned steps:
+
+Open the dyn/admin of publishing & navigate to http://lnxs0607:8070/dyn/admin/nucleus/atg/epub/DeploymentServer/ 
+
+& copy the snapshot from the bcc & force the snap shot for the same.
+
+
+in case if this does not works , then perform the said steps :
+
+Open the dyn/admin for Publishing server.
+
+Search for AuthenticationServlet & select the "/atg/dynamo/servlet/adminpipeline/AuthenticationServlet "
+
+Then , set the "enabled" property as "true"
+
+
+& again try to force the snap shot in the same .

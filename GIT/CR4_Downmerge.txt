@@ -1,0 +1,58 @@
+git checkout Core_Maintenance_Refactor
+git pull
+git merge origin/CR3_Devmaster_Restructure
+
+-------------------------------------------------
+
+Review changeset and for any things that Git flags as:
+
+"added by them and 'deleted by us'" - these are likely to be moved files that will need to be moved again later and manually merged/checked for differences.
+
+Check that any other 'deleted by us' files do not require changes to be migrated elsewhere.
+
+git mergetool
+(run through files that need merging)
+
+buildr clean build assemble
+
+git commit
+
+-------------------------------------------------
+Make any fixes to new XML files for JSP's: (New XML's that should be in the KF/env-install/database/metadata folders)
+
+** Note all B&Q XML's should now sit under BQ/env-install/database/metadata so you should only need to move the ones in KF
+
+For JSP's: (places where a jsp is referenced) - e.g. <set-property name="rawPath"><![CDATA[/common:/customer/block/panels/account/tradeDetails.jsp]]></set-property>
+
+kf-app -> common:
+diy-app -> common:
+
+(note the : - this is so SiteBuilder knows to look in the correct context (web-app) - which is kf-storefront)
+
+-------------------------------------------------
+For CSS and JS Files referenced in the XML's:
+
+kf-app
+diy-app
+
+From - href="/diy-app/css/areas/basket.css"
+To - href="/content/${siteBuilderContext.site.id}/css/areas/basket.css"
+
+This will support multiple stores going forward (casto, etc) when they copy the XML's from us for their first sitebuilder load.
+
+
+
+tp-app - **This stays as-is**
+
+--------------------------------------------------
+
+Make any other required changes, e.g. modify the buildfile, move new files from KF to BQ if required (XML's)
+
+** Make sure JSP's are moved from storefront.war to kf-storefront.war in KF/Web
+(We are no longer using storefront.war) - it should be removed in the near future completely.
+
+buildr clean build assemble db_inc data_load_data 
+
+git commit
+
+git push
