@@ -1,0 +1,169 @@
+def sonar_instance_name= "${team}"
+
+def under_folder = 'SonarInstances/'+sonar_instance_name
+def sonar_url = 'http://atg-'+sonar_instance_name+'-aws-sonar01.aws.gha.kfplc.com:9000'
+
+folder(under_folder)
+
+
+job( under_folder +'/available') {
+    description 'Check Sonar availability every 5 minutes'
+    logRotator {
+      daysToKeep -1
+      numToKeep 5
+    }
+ 
+    triggers {
+    	cron('H/5 * * * *')
+    }
+    
+    steps {
+    
+	    downstreamParameterized {
+			                trigger('Infra/toc/UrlToCheck,Infra/toc/DownloadSonarPage') {
+			                      block {
+					                    buildStepFailure('FAILURE')
+					                    failure('FAILURE')
+					                    unstable('UNSTABLE')
+					                }
+			                      parameters{
+			                      currentBuild() 
+			                      predefinedProp('URL_TO_TEST',sonar_url)
+			                      predefinedProp('team',sonar_instance_name)
+			                      }                    
+			                }
+			            }
+    }  
+}
+
+
+
+
+job( under_folder +'/start') {
+    description 'Jenkins Start '
+    logRotator {
+      daysToKeep -1
+      numToKeep 5
+    }
+
+    
+    steps {
+    
+	    downstreamParameterized {
+			                trigger('Infra/toc/StartOrStopSonar') {
+			                      block {
+					                    buildStepFailure('FAILURE')
+					                    failure('FAILURE')
+					                    unstable('UNSTABLE')
+					                }
+			                      parameters{
+			                      currentBuild() 
+			                      predefinedProp('team',sonar_instance_name)
+			                      predefinedProp('action','start')
+			                      }                    
+			                }
+			            }
+    }  
+}
+
+
+job( under_folder +'/stop') {
+    description 'Sonar stop '
+    logRotator {
+      daysToKeep -1
+      numToKeep 5
+    }
+
+    
+    steps {
+    
+	    downstreamParameterized {
+			                trigger('Infra/toc/StartOrStopSonar') {
+			                      block {
+					                    buildStepFailure('FAILURE')
+					                    failure('FAILURE')
+					                    unstable('UNSTABLE')
+					                }
+			                      parameters{
+			                      currentBuild() 
+			                      predefinedProp('team',sonar_instance_name)
+			                      predefinedProp('action','stop')
+			                      }                    
+			                }
+			            }
+    }  
+}
+
+
+job( under_folder +'/upgrade') {
+    description 'Upgrade Sonar '
+    logRotator {
+      daysToKeep -1
+      numToKeep 5
+    }
+
+    
+    steps {
+    
+	    downstreamParameterized {
+			                trigger('Infra/toc/UpgradeSonar') {
+			                      block {
+					                    buildStepFailure('FAILURE')
+					                    failure('FAILURE')
+					                    unstable('UNSTABLE')
+					                }
+			                      parameters{
+			                      currentBuild() 
+			                      predefinedProp('team',sonar_instance_name)
+			                      }                    
+			                }
+			            }
+    }  
+}
+
+
+job( under_folder +'/delete') {
+    description 'delete Sonar '
+    logRotator {
+      daysToKeep -1
+      numToKeep 5
+    }
+
+    
+    steps {
+    
+	    downstreamParameterized {
+			                trigger('Infra/toc/DeleteSonar') {
+			                      block {
+					                    buildStepFailure('FAILURE')
+					                    failure('FAILURE')
+					                    unstable('UNSTABLE')
+					                }
+			                      parameters{
+			                      currentBuild() 
+			                      predefinedProp('team',sonar_instance_name)
+			                      }                    
+			                }
+			            }
+    }  
+}
+
+
+dashboardView(under_folder +'/'+sonar_instance_name+'-page') {
+  description('<a href='+sonar_url+'>'+sonar_instance_name+'</a>')
+    jobs {
+        name('available')
+    }
+    columns {
+        status()
+        weather()
+        buildButton()
+    }
+    topPortlets {
+        iframe {
+            displayName(sonar_instance_name)
+            effectiveUrl('/userContent/sonar/'+sonar_instance_name+'/index.html')
+        }
+    }  
+}
+

@@ -1,0 +1,253 @@
+def jenkins_master_name= "${team}"
+
+def under_folder = 'Jenkins-Masters/'+jenkins_master_name
+folder(under_folder)
+
+
+job( under_folder +'/available') {
+    description 'Check Jenkins availability every 5 minutes'
+    logRotator {
+      daysToKeep -1
+      numToKeep 5
+    }
+ 
+    triggers {
+    	cron('H/5 * * * *')
+    }
+    
+    steps {
+    
+	    downstreamParameterized {
+			                trigger('Infra/toc/UrlToCheck,Infra/toc/DownloadJenkinsMasterPage') {
+			                      block {
+					                    buildStepFailure('FAILURE')
+					                    failure('FAILURE')
+					                    unstable('UNSTABLE')
+					                }
+			                      parameters{
+			                      currentBuild() 
+			                      predefinedProp('URL_TO_TEST','http://jenkins-'+jenkins_master_name+'-master.aws.ghanp.kfplc.com:8080')
+			                      predefinedProp('team',jenkins_master_name)
+			                      }                    
+			                }
+			            }
+    }  
+}
+
+
+
+job( under_folder +'/backup') {
+    description 'Backup Jenkins everyday once '
+    logRotator {
+      daysToKeep -1
+      numToKeep 5
+    }
+ 
+    triggers {
+    	cron('@midnight')
+    }
+    
+    steps {
+    
+	    downstreamParameterized {
+			                trigger('Infra/toc/BackupJenkinsToNexus') {
+			                      block {
+					                    buildStepFailure('FAILURE')
+					                    failure('FAILURE')
+					                    unstable('UNSTABLE')
+					                }
+			                      parameters{
+			                      currentBuild() 
+			                      predefinedProp('team',jenkins_master_name)
+			                      }                    
+			                }
+			            }
+    }  
+}
+
+
+
+job( under_folder +'/restore') {
+    description 'Restore Jenkins Manually '
+    logRotator {
+      daysToKeep -1
+      numToKeep 5
+    }
+
+    
+    steps {
+    
+	    downstreamParameterized {
+			                trigger('Infra/toc/RestoreJenkinsFromNexus') {
+			                      block {
+					                    buildStepFailure('FAILURE')
+					                    failure('FAILURE')
+					                    unstable('UNSTABLE')
+					                }
+			                      parameters{
+			                      currentBuild() 
+			                      predefinedProp('team',jenkins_master_name)
+			                      }                    
+			                }
+			            }
+    }  
+}
+
+
+job( under_folder +'/addEnv') {
+    description 'Add environment to Jenkins '
+    logRotator {
+      daysToKeep -1
+      numToKeep 5
+    }
+ parameters {
+        stringParam('ENV_PREFIX','','Environment Name to add')
+        }
+    
+    steps {
+    
+	    downstreamParameterized {
+			                trigger('Infra/toc/AttachEnvironmentToJenkinsMaster') {
+			                      block {
+					                    buildStepFailure('FAILURE')
+					                    failure('FAILURE')
+					                    unstable('UNSTABLE')
+					                }
+			                      parameters{
+			                      currentBuild() 
+			                      predefinedProp('team',jenkins_master_name)
+			                      }                    
+			                }
+			            }
+    }  
+}
+
+
+job( under_folder +'/start') {
+    description 'Jenkins Start '
+    logRotator {
+      daysToKeep -1
+      numToKeep 5
+    }
+
+    
+    steps {
+    
+	    downstreamParameterized {
+			                trigger('Infra/toc/StopOrStartJenkins') {
+			                      block {
+					                    buildStepFailure('FAILURE')
+					                    failure('FAILURE')
+					                    unstable('UNSTABLE')
+					                }
+			                      parameters{
+			                      currentBuild() 
+			                      predefinedProp('team',jenkins_master_name)
+			                      predefinedProp('state','running')
+			                      }                    
+			                }
+			            }
+    }  
+}
+
+
+job( under_folder +'/stop') {
+    description 'Jenkins stop '
+    logRotator {
+      daysToKeep -1
+      numToKeep 5
+    }
+
+    
+    steps {
+    
+	    downstreamParameterized {
+			                trigger('Infra/toc/StopOrStartJenkins') {
+			                      block {
+					                    buildStepFailure('FAILURE')
+					                    failure('FAILURE')
+					                    unstable('UNSTABLE')
+					                }
+			                      parameters{
+			                      currentBuild() 
+			                      predefinedProp('team',jenkins_master_name)
+			                      predefinedProp('state','stopped')
+			                      }                    
+			                }
+			            }
+    }  
+}
+
+
+job( under_folder +'/upgrade') {
+    description 'Upgrade Jenkins '
+    logRotator {
+      daysToKeep -1
+      numToKeep 5
+    }
+
+    
+    steps {
+    
+	    downstreamParameterized {
+			                trigger('Infra/toc/UpgradeJenkins') {
+			                      block {
+					                    buildStepFailure('FAILURE')
+					                    failure('FAILURE')
+					                    unstable('UNSTABLE')
+					                }
+			                      parameters{
+			                      currentBuild() 
+			                      predefinedProp('team',jenkins_master_name)
+			                      }                    
+			                }
+			            }
+    }  
+}
+
+
+job( under_folder +'/delete') {
+    description 'delete Jenkins '
+    logRotator {
+      daysToKeep -1
+      numToKeep 5
+    }
+
+    
+    steps {
+    
+	    downstreamParameterized {
+			                trigger('Infra/toc/DeleteJenkinsMaster') {
+			                      block {
+					                    buildStepFailure('FAILURE')
+					                    failure('FAILURE')
+					                    unstable('UNSTABLE')
+					                }
+			                      parameters{
+			                      currentBuild() 
+			                      predefinedProp('team',jenkins_master_name)
+			                      }                    
+			                }
+			            }
+    }  
+}
+
+
+dashboardView(under_folder +'/'+jenkins_master_name+'-page') {
+  description('<a href=http://jenkins-'+jenkins_master_name+'-master.aws.ghanp.kfplc.com:8080>'+jenkins_master_name+'</a>')
+    jobs {
+        name('available')
+    }
+    columns {
+        status()
+        weather()
+        buildButton()
+    }
+    topPortlets {
+        iframe {
+            displayName(jenkins_master_name)
+            effectiveUrl('/userContent/jenkins/'+jenkins_master_name+'/index.html')
+        }
+    }  
+}
+
