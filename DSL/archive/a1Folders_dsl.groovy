@@ -1,0 +1,7 @@
+folder("ATG")
+folder("ATG/Build")
+folder("ATG/Deploy")
+folder("ATG/Database")
+folder("ATG/Release")
+folder("ATG/Test")
+folder("ATG/Update")
